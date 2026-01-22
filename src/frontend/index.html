@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart PDA - Personal Digital Assistant</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .status { background: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .todo-item { padding: 10px; border-bottom: 1px solid #eee; }
+        .todo-item.completed { text-decoration: line-through; color: #888; }
+    </style>
+</head>
+<body>
+    <h1>📱 Smart PDA</h1>
+    <p>Your Personal Digital Assistant Dashboard</p>
+    
+    <div class="status">
+        <h3>System Status</h3>
+        <div id="health-status">Checking...</div>
+    </div>
+    
+    <div>
+        <h3>Todo List</h3>
+        <div id="todo-list">Loading...</div>
+    </div>
+
+    <script>
+        // Fetch health status
+        fetch('/api/health')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('health-status').innerHTML = 
+                    `<strong>Status:</strong> ${data.status}<br>
+                     <strong>Service:</strong> ${data.service}<br>
+                     <strong>Time:</strong> ${new Date(data.timestamp).toLocaleString()}`;
+            });
+
+        // Fetch todos
+        fetch('/api/todos')
+            .then(r => r.json())
+            .then(todos => {
+                const list = document.getElementById('todo-list');
+                list.innerHTML = todos.map(todo => 
+                    `<div class="todo-item ${todo.completed ? 'completed' : ''}">
+                        ${todo.title}
+                    </div>`
+                ).join('');
+            });
+    </script>
+</body>
+</html>
