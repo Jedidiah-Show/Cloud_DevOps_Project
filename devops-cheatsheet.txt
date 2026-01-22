@@ -1,0 +1,55 @@
+📝 Jedidiah’s Linux + Vim Cheat Sheet for DevOps
+
+1️⃣  Linux Navigation & Files
+Command	What it does	Example
+pwd	Show current directory	pwd → /home/ubuntu
+ls	List files/folders	ls -l (detailed)
+cd <folder>	Change directory	cd /var/log
+mkdir <folder>	Make new folder	mkdir myfolder
+rm <file>	Delete a file	rm file.txt
+rm -r <folder>	Delete folder & contents	rm -r myfolder
+touch <file>	Create empty file	touch test.txt
+cp <source> <dest>	Copy file/folder	cp file.txt backup.txt
+mv <source> <dest>	Move/rename file	mv file.txt old.txt
+
+2️⃣  File Viewing & Editing
+Command	What it does	Example
+cat <file>	Display file contents	cat test.txt
+less <file>	Scrollable view	less test.txt
+nano <file>	Open simple editor	nano test.txt
+vim <file>	Open vim editor	vim test.txt
+
+3️⃣  Vim Basics
+Modes:
+Insert mode → Type text (i to enter)
+Normal mode → Commands (press Esc to enter)
+
+Exiting Vim:
+Command	What it does
+:q	Quit (if no changes made)
+:q!	Quit without saving
+:wq	Save and quit
+ZZ	Save and quit (shortcut)
+
+4️⃣  Permissions & Admin
+Command	What it does
+chmod +x <file>	Make file executable
+sudo <command>	Run command as admin
+
+5️⃣  Processes & Monitoring
+Command	What it does
+top	View running processes
+htop	Fancy interactive process viewer
+ps aux	List processes
+
+6️⃣  Misc / Handy Tips
+Ctrl + C → Stop a running command
+Ctrl + Z → Pause command, send to background
+Tab → Auto-complete file/folder names
+Arrow keys → Navigate in nano or vim
+
+7️⃣  Safe Deletion & Wildcards
+rm <filename>         → Delete a single file
+rm -i <pattern>*      → Delete multiple files matching a pattern, asks for confirmation before each deletion
+* Use quotes around filenames with spaces or special characters
+* Be careful with wildcards (*) – they can delete multiple files at once
