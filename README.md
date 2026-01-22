@@ -1,4 +1,4 @@
-# Smart PDA – DevOps Foundations
+# Ruach: Smart PDA – DevOps Foundations
 
 This repository tracks my Cloud & DevOps learning journey.
 ## DevOps Concepts
