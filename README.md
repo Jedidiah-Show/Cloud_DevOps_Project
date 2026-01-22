@@ -8,4 +8,3 @@ This repository tracks my Cloud & DevOps learning journey.
 - Tools I’ll learn: Git, Docker, AWS, Terraform, CI/CD
 
 # Cloud_DevOps_Project
-
