@@ -1,0 +1,51 @@
+graph TB
+    subgraph "Development"
+        Dev[Developers] -->|Code Push| GitHub
+        GitHub[GitHub Repository<br/>smart-pda/] -->|Triggers| CI_CD
+    end
+
+    subgraph "CI/CD Pipeline"
+        CI_CD[GitHub Actions]
+        CI_CD --> CI[ci.yml<br/>Build & Test]
+        CI_CD --> Terraform[terraform.yml<br/>Infra Provisioning]
+        CI_CD --> Deploy[deploy.yml<br/>K8s Deployment]
+    end
+
+    subgraph "Infrastructure Layer"
+        Terraform -->|Deploys| CloudInfra[Cloud Infrastructure]
+        CloudInfra --> VPC[VPC Network]
+        CloudInfra --> EC2[EC2 Instances]
+        CloudInfra --> SG[Security Groups]
+        
+        CloudInfra --> K8s[Kubernetes Cluster]
+    end
+
+    subgraph "Application Layer"
+        K8s -->|Hosts| Frontend[Frontend Service]
+        K8s -->|Hosts| Backend[Backend Service]
+        
+        Frontend -->|Built from| DockerFront[Dockerfile]
+        Backend -->|Built from| DockerBack[Dockerfile.backend]
+        
+        Frontend <-->|API Calls| Backend
+    end
+
+    subgraph "Monitoring & Observability"
+        Prometheus[Prometheus] -->|Monitors| K8s
+        Grafana[Grafana] -->|Visualizes from| Prometheus
+        Alerts[Alert Manager] -->|Notifies| Teams[SRE/DevOps Teams]
+    end
+
+    subgraph "External Systems"
+        Users[End Users] -->|Accesses| Frontend
+        ExternalAPIs[External APIs] <-->|Integrates with| Backend
+        Storage[(Database/Storage)] <-->|Data Persistence| Backend
+    end
+
+    style Dev fill:#e1f5fe
+    style GitHub fill:#f3e5f5
+    style CI_CD fill:#fff3e0
+    style CloudInfra fill:#e8f5e8
+    style K8s fill:#e3f2fd
+    style Frontend fill:#fce4ec
+    style Backend fill:#f3e5f5
