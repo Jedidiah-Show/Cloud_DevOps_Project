@@ -1,3 +1,4 @@
+
 # RUACH: Smart PDA (Personal Digital Assistant)
 
 ## 📋 Table of Contents
@@ -72,7 +73,7 @@ sequenceDiagram
 ## 📁 Project Structure
 
 ```
-smart-pda/
+Ruach_smart-pda/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml
