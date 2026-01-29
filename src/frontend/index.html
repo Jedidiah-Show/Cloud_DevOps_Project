@@ -1,50 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Smart PDA - Personal Digital Assistant</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .status { background: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0; }
-        .todo-item { padding: 10px; border-bottom: 1px solid #eee; }
-        .todo-item.completed { text-decoration: line-through; color: #888; }
-    </style>
+  <meta charset="UTF-8" />
+  <title>RUACH PDA – Daily Check-in</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      margin-top: 30px;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      margin: 6px 0;
+    }
+    .box {
+      background: #fff;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 15px;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <h1>📱 Smart PDA</h1>
-    <p>Your Personal Digital Assistant Dashboard</p>
-    
-    <div class="status">
-        <h3>System Status</h3>
-        <div id="health-status">Checking...</div>
-    </div>
-    
-    <div>
-        <h3>Todo List</h3>
-        <div id="todo-list">Loading...</div>
-    </div>
 
-    <script>
-        // Fetch health status
-        fetch('/api/health')
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('health-status').innerHTML = 
-                    `<strong>Status:</strong> ${data.status}<br>
-                     <strong>Service:</strong> ${data.service}<br>
-                     <strong>Time:</strong> ${new Date(data.timestamp).toLocaleString()}`;
-            });
+  <h1>🧭 RUACH PDA – Daily Check-in</h1>
 
-        // Fetch todos
-        fetch('/api/todos')
-            .then(r => r.json())
-            .then(todos => {
-                const list = document.getElementById('todo-list');
-                list.innerHTML = todos.map(todo => 
-                    `<div class="todo-item ${todo.completed ? 'completed' : ''}">
-                        ${todo.title}
-                    </div>`
-                ).join('');
-            });
-    </script>
+  <div class="box">
+    <h2>Today’s Anchor</h2>
+    <textarea id="anchor" placeholder="Which part of who I am needs attention today?"></textarea>
+
+    <h2>⚡ Priority Habit</h2>
+    <textarea id="priority" placeholder="1–2 habits that matter most today"></textarea>
+  </div>
+
+  <div class="box">
+    <h2>Habit Tracker</h2>
+    <label><input type="checkbox" id="faith"> Faith / Values</label>
+    <label><input type="checkbox" id="learning"> Learning & Growth</label>
+    <label><input type="checkbox" id="health"> Health</label>
+    <label><input type="checkbox" id="relationships"> Relationships</label>
+  </div>
+
+  <div class="box">
+    <h2>Anchor Check (Evening)</h2>
+    <label><input type="radio" name="alignment" value="yes"> Yes, mostly</label>
+    <label><input type="radio" name="alignment" value="partial"> Partially</label>
+    <label><input type="radio" name="alignment" value="no"> No — I drifted</label>
+  </div>
+
+  <button onclick="saveData()">Save Today</button>
+
+  <script>
+    const fields = [
+      "anchor",
+      "priority",
+      "faith",
+      "learning",
+      "health",
+      "relationships"
+    ];
+
+    function saveData() {
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        localStorage.setItem(id, el.type === "checkbox" ? el.checked : el.value);
+      });
+
+      const alignment = document.querySelector('input[name="alignment"]:checked');
+      if (alignment) {
+        localStorage.setItem("alignment", alignment.value);
+      }
+
+      alert("Daily check-in saved ✅");
+    }
+
+    function loadData() {
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        const saved = localStorage.getItem(id);
+        if (saved !== null) {
+          el.type === "checkbox" ? el.checked = saved === "true" : el.value = saved;
+        }
+      });
+
+      const alignment = localStorage.getItem("alignment");
+      if (alignment) {
+        const radio = document.querySelector(`input[value="${alignment}"]`);
+        if (radio) radio.checked = true;
+      }
+    }
+
+    loadData();
+  </script>
+
 </body>
 </html>
+
