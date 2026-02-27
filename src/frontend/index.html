@@ -1,117 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>RUACH PDA – Daily Check-in</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-    h2 {
-      margin-top: 30px;
-    }
-    textarea, input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 6px;
-      margin-bottom: 12px;
-    }
-    label {
-      display: block;
-      margin: 6px 0;
-    }
-    .box {
-      background: #fff;
-      padding: 15px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-    }
-    button {
-      padding: 10px 15px;
-      background: #222;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ruach – Personal Digital Assistant</title>
+
+<style>
+:root {
+  --bg: linear-gradient(135deg, #1e1e2f, #2b2b45);
+  --glass: rgba(255,255,255,0.08);
+  --accent: #7ae3c3;
+  --danger: #ff6b6b;
+  --text: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 20px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+
+.card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+h1 {
+  font-weight: 300;
+  letter-spacing: 2px;
+}
+
+.subtitle {
+  opacity: 0.7;
+  margin-bottom: 20px;
+}
+
+.anchor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+  gap: 12px;
+}
+
+.anchor-card {
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(255,255,255,0.05);
+  transition: all 0.3s ease;
+}
+
+.anchor-card.active {
+  background: var(--accent);
+  color: #000;
+  font-weight: bold;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  resize: none;
+  margin-top: 10px;
+}
+
+.checkbox-group label {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+}
+
+.progress-bar {
+  height: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.alignment-options label {
+  margin-right: 15px;
+}
+
+button {
+  background: var(--accent);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.toggle-mode {
+  float: right;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.clock {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+</style>
 </head>
+
 <body>
+<div class="container">
 
-  <h1>🧭 RUACH PDA – Daily Check-in</h1>
+<h1>🌬 Ruach</h1>
+<div class="subtitle" id="greeting"></div>
+<div class="clock" id="clock"></div>
 
-  <div class="box">
-    <h2>Today’s Anchor</h2>
-    <textarea id="anchor" placeholder="Which part of who I am needs attention today?"></textarea>
+<div class="card">
+<h2>🧭 Choose Today’s Anchor</h2>
+<div class="anchor-grid">
+<div class="anchor-card" data-anchor="Faith">Faith / Values</div>
+<div class="anchor-card" data-anchor="Learning">Learning & Growth</div>
+<div class="anchor-card" data-anchor="Health">Health</div>
+<div class="anchor-card" data-anchor="Relationships">Relationships</div>
+</div>
+</div>
 
-    <h2>⚡ Priority Habit</h2>
-    <textarea id="priority" placeholder="1–2 habits that matter most today"></textarea>
-  </div>
+<div class="card">
+<h2>⚡ Priority Focus</h2>
+<textarea id="priority" rows="2" placeholder="What must receive focused attention today?"></textarea>
+</div>
 
-  <div class="box">
-    <h2>Habit Tracker</h2>
-    <label><input type="checkbox" id="faith"> Faith / Values</label>
-    <label><input type="checkbox" id="learning"> Learning & Growth</label>
-    <label><input type="checkbox" id="health"> Health</label>
-    <label><input type="checkbox" id="relationships"> Relationships</label>
-  </div>
+<div class="card">
+<h2>✅ Habit Tracker</h2>
+<div class="checkbox-group">
+<label>Faith <input type="checkbox" data-habit="faith"></label>
+<label>Learning <input type="checkbox" data-habit="learning"></label>
+<label>Health <input type="checkbox" data-habit="health"></label>
+<label>Relationships <input type="checkbox" data-habit="relationships"></label>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+</div>
 
-  <div class="box">
-    <h2>Anchor Check (Evening)</h2>
-    <label><input type="radio" name="alignment" value="yes"> Yes, mostly</label>
-    <label><input type="radio" name="alignment" value="partial"> Partially</label>
-    <label><input type="radio" name="alignment" value="no"> No — I drifted</label>
-  </div>
+<div class="card">
+<h2>🌙 Alignment Check</h2>
+<div class="alignment-options">
+<label><input type="radio" name="align" value="yes"> Yes</label>
+<label><input type="radio" name="align" value="partial"> Partial</label>
+<label><input type="radio" name="align" value="no"> Drifted</label>
+</div>
+</div>
 
-  <button onclick="saveData()">Save Today</button>
+<button onclick="saveData()">Save Today</button>
 
-  <script>
-    const fields = [
-      "anchor",
-      "priority",
-      "faith",
-      "learning",
-      "health",
-      "relationships"
-    ];
+</div>
 
-    function saveData() {
-      fields.forEach(id => {
-        const el = document.getElementById(id);
-        localStorage.setItem(id, el.type === "checkbox" ? el.checked : el.value);
-      });
+<script>
+// Greeting Logic
+function updateGreeting() {
+  const hour = new Date().getHours();
+  let greet = "Stay aligned.";
+  if (hour < 12) greet = "Good morning. Lead with intention.";
+  else if (hour < 18) greet = "Good afternoon. Stay anchored.";
+  else greet = "Good evening. Reflect deeply.";
+  document.getElementById("greeting").innerText = greet;
+}
+updateGreeting();
 
-      const alignment = document.querySelector('input[name="alignment"]:checked');
-      if (alignment) {
-        localStorage.setItem("alignment", alignment.value);
+// Clock
+setInterval(() => {
+  document.getElementById("clock").innerText =
+    new Date().toLocaleString();
+}, 1000);
+
+// Anchor Selection
+document.querySelectorAll(".anchor-card").forEach(card => {
+  card.addEventListener("click", () => {
+    document.querySelectorAll(".anchor-card").forEach(c => c.classList.remove("active"));
+    card.classList.add("active");
+    localStorage.setItem("anchor", card.dataset.anchor);
+  });
+});
+
+// Habit Progress
+const checkboxes = document.querySelectorAll("[data-habit]");
+checkboxes.forEach(cb => {
+  cb.addEventListener("change", updateProgress);
+});
+
+function updateProgress() {
+  let total = checkboxes.length;
+  let checked = [...checkboxes].filter(c => c.checked).length;
+  let percent = (checked / total) * 100;
+  document.getElementById("progressFill").style.width = percent + "%";
+}
+
+// Save Data
+function saveData() {
+  const activeAnchor = document.querySelector(".anchor-card.active");
+  if (activeAnchor) {
+    localStorage.setItem("anchor", activeAnchor.dataset.anchor);
+  }
+
+  localStorage.setItem("priority", document.getElementById("priority").value);
+
+  checkboxes.forEach(cb => {
+    localStorage.setItem(cb.dataset.habit, cb.checked);
+  });
+
+  const align = document.querySelector('input[name="align"]:checked');
+  if (align) {
+    localStorage.setItem("alignment", align.value);
+  }
+
+  alert("Ruach saved today’s alignment 🌬");
+}
+
+// Load Data
+window.onload = function() {
+  const savedAnchor = localStorage.getItem("anchor");
+  if (savedAnchor) {
+    document.querySelectorAll(".anchor-card").forEach(card => {
+      if (card.dataset.anchor === savedAnchor) {
+        card.classList.add("active");
       }
+    });
+  }
 
-      alert("Daily check-in saved ✅");
-    }
+  document.getElementById("priority").value = localStorage.getItem("priority") || "";
 
-    function loadData() {
-      fields.forEach(id => {
-        const el = document.getElementById(id);
-        const saved = localStorage.getItem(id);
-        if (saved !== null) {
-          el.type === "checkbox" ? el.checked = saved === "true" : el.value = saved;
-        }
-      });
+  checkboxes.forEach(cb => {
+    cb.checked = localStorage.getItem(cb.dataset.habit) === "true";
+  });
 
-      const alignment = localStorage.getItem("alignment");
-      if (alignment) {
-        const radio = document.querySelector(`input[value="${alignment}"]`);
-        if (radio) radio.checked = true;
-      }
-    }
+  const alignment = localStorage.getItem("alignment");
+  if (alignment) {
+    document.querySelector(`input[value="${alignment}"]`).checked = true;
+  }
 
-    loadData();
-  </script>
-
+  updateProgress();
+};
+</script>
 </body>
 </html>
-
