@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ruach v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: Arial;
+  background: #111827;
+  color: white;
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+.card {
+  background: #1f2937;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+button {
+  padding: 10px 15px;
+  background: #10b981;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.progress {
+  height: 8px;
+  background: #374151;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #10b981;
+  width: 0%;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🌬 Ruach v2</h1>
+
+<div class="card">
+<h2>🧭 Anchor</h2>
+<select id="anchor">
+<option>Faith</option>
+<option>Learning</option>
+<option>Health</option>
+<option>Relationships</option>
+</select>
+</div>
+
+<div class="card">
+<h2>⚡ Priority</h2>
+<textarea id="priority" rows="2"></textarea>
+</div>
+
+<div class="card">
+<h2>✅ Habits</h2>
+<label><input type="checkbox" data-habit="faith"> Faith</label><br>
+<label><input type="checkbox" data-habit="learning"> Learning</label><br>
+<label><input type="checkbox" data-habit="health"> Health</label><br>
+<label><input type="checkbox" data-habit="relationships"> Relationships</label>
+<div class="progress"><div class="progress-fill" id="progress"></div></div>
+</div>
+
+<div class="card">
+<h2>🌙 Alignment</h2>
+<label><input type="radio" name="align" value="yes"> Yes</label>
+<label><input type="radio" name="align" value="partial"> Partial</label>
+<label><input type="radio" name="align" value="no"> Drifted</label>
+</div>
+
+<div class="card">
+<h2>🧠 AI Reflection</h2>
+<div id="reflection">No reflection yet.</div>
+</div>
+
+<button onclick="saveToday()">Save</button>
+
+<script>
+const API_BASE = "http://localhost:5000/api";
+const USER_ID = "jedidiah"; // temporary hardcoded user
+
+const todayKey = new Date().toISOString().split('T')[0];
+
+function getState() {
+  return {
+    anchor: document.getElementById("anchor").value,
+    priority: document.getElementById("priority").value,
+    habits: [...document.querySelectorAll("[data-habit]")]
+      .reduce((acc, cb) => {
+        acc[cb.dataset.habit] = cb.checked;
+        return acc;
+      }, {}),
+    alignment: document.querySelector("input[name='align']:checked")?.value || null,
+    date: todayKey
+  };
+}
+
+async function saveToday() {
+  const state = {
+    userId: USER_ID,
+    date: new Date().toISOString().split("T")[0],
+    anchor: document.getElementById("anchor").value,
+    priority: document.getElementById("priority").value,
+    habits: [...document.querySelectorAll("[data-habit]")]
+      .reduce((acc, cb) => {
+        acc[cb.dataset.habit] = cb.checked;
+        return acc;
+      }, {}),
+    alignment: document.querySelector("input[name='align']:checked")?.value || null
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/daily`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(state)
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert("Saved to Ruach Cloud 🌬");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Server not reachable.");
+  }
+}
+
+function archiveIfNewDay() {
+  const saved = JSON.parse(localStorage.getItem("ruach-lastDate"));
+  if (saved !== todayKey) {
+    const history = JSON.parse(localStorage.getItem("ruach-history") || "[]");
+    const yesterday = JSON.parse(localStorage.getItem("ruach-today"));
+    if (yesterday) history.push(yesterday);
+    localStorage.setItem("ruach-history", JSON.stringify(history));
+    localStorage.setItem("ruach-lastDate", todayKey);
+    resetDaily();
+  }
+}
+
+function resetDaily() {
+  document.querySelectorAll("[data-habit]").forEach(cb => cb.checked = false);
+  document.getElementById("priority").value = "";
+  document.querySelectorAll("input[name='align']").forEach(r => r.checked = false);
+}
+
+function updateProgress() {
+  const total = document.querySelectorAll("[data-habit]").length;
+  const checked = [...document.querySelectorAll("[data-habit]")]
+    .filter(cb => cb.checked).length;
+  document.getElementById("progress").style.width = (checked/total*100)+"%";
+}
+
+document.querySelectorAll("[data-habit]").forEach(cb =>
+  cb.addEventListener("change", updateProgress)
+);
+
+async function loadHistory() {
+  try {
+    const res = await fetch(`${API_BASE}/daily/${USER_ID}`);
+    const history = await res.json();
+
+    console.log("History:", history);
+    return history;
+  } catch (err) {
+    console.error("History load failed:", err);
+  }
+}
+loadHistory();
+
+function loadToday() {
+  const state = JSON.parse(localStorage.getItem("ruach-today"));
+  if (!state || state.date !== todayKey) return;
+  document.getElementById("anchor").value = state.anchor;
+  document.getElementById("priority").value = state.priority;
+  for (let h in state.habits) {
+    document.querySelector(`[data-habit="${h}"]`).checked = state.habits[h];
+  }
+  if (state.alignment)
+    document.querySelector(`input[value="${state.alignment}"]`).checked = true;
+  updateProgress();
+}
+
+loadToday();
+archiveIfNewDay();
+
+
+// 🔔 Smart Nudge Engine
+if (Notification.permission !== "granted") {
+  Notification.requestPermission();
+}
+
+function sendNudge(message) {
+  if (Notification.permission === "granted") {
+    new Notification("Ruach 🌬", { body: message });
+  }
+}
+
+setTimeout(() => sendNudge("Set your Anchor for today."), 5000);
+setTimeout(() => sendNudge("Evening reflection time."), 1000 * 60 * 60 * 8);
+
+
+// ☁ Cloud Sync (Firebase Ready)
+function syncCloud(state) {
+  console.log("Sync placeholder:", state);
+  // Replace with Firebase:
+  // firebase.firestore().collection("ruach").doc(todayKey).set(state);
+}
+
+
+// 🧠 AI Reflection Engine (Weekly)
+async function generateReflection() {
+  const history = JSON.parse(localStorage.getItem("ruach-history") || "[]");
+  if (history.length < 3) return;
+
+  const summary = history.slice(-7);
+
+  const response = await fetch("https://your-ai-endpoint.com/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ summary })
+  });
+
+  const data = await response.json();
+  document.getElementById("reflection").innerText = data.insight;
+}
+
+// Call manually for now
+// generateReflection();
+
+</script>
+</body>
+</html>
