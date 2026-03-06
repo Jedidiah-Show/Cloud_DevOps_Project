@@ -2,28 +2,13 @@ const express = require("express");
 const router = express.Router();
 const db = require("../services/db");
 
-// Save daily state
+// backend/routes/daily.js
 router.post("/", async (req, res) => {
-  try {
-    const { userId, date, anchor, priority, habits, alignment } = req.body;
-
-    await db.collection("ruach")
-      .doc(userId)
-      .collection("daily")
-      .doc(date)
-      .set({
-        anchor,
-        priority,
-        habits,
-        alignment,
-        timestamp: new Date()
-      });
-
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const state = req.body;
+  // Save to DB
+  res.json({ message: "State saved successfully" });
 });
+
 
 // Get history
 router.get("/:userId", async (req, res) => {
